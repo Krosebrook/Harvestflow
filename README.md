@@ -26,3 +26,4 @@ Automated flow harvester that ingests chat exports, clusters topics, produces pe
 - Multi-CLI execution is best-effort; the scripts skip any CLI that is not installed on the local system.
 - Governance checklist and baseline process live in `docs/governance.md`.
 - Configure vector store mode in `config.json` (`mem` for in-memory, `file` for persisted embeddings).
+- CI notifications use a Teams incoming webhook stored as the `TEAMS_WEBHOOK_URL` GitHub secret.
