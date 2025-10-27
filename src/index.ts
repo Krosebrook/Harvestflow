@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { loadChat } from "./ingest/load.js";
 import { cluster } from "./cluster/topics.js";
 import { buildFlows } from "./flows/build.js";
@@ -15,6 +17,13 @@ async function main() {
   const { buildPrompt } = await import("./builders/prompt.js");
   const { buildCode } = await import("./builders/code.js");
 
+  const summary: {
+    flowId: string;
+    title: string;
+    qualityScore: number;
+    metrics: (typeof flows)[number]["metrics"];
+  }[] = [];
+
   for (const flow of flows) {
     const msgIds = flow.nodes[0]?.msgIds ?? [];
     const msgs = chat.messages
@@ -27,11 +36,27 @@ async function main() {
 
     Metrics.push({ flowId: flow.id, label: "qualityScore", value: qualityScore(flow.metrics), ts: Date.now() });
 
+    const flowMetrics = {
+      flowId: flow.id,
+      title: flow.title,
+      qualityScore: qualityScore(flow.metrics),
+      metrics: flow.metrics
+    };
+    summary.push(flowMetrics);
+    fs.mkdirSync(path.join("out", "flows", flow.id), { recursive: true });
+    fs.writeFileSync(
+      path.join("out", "flows", flow.id, "metrics.json"),
+      JSON.stringify(flowMetrics, null, 2),
+      "utf8"
+    );
+
     writeDeliverables(flow);
     zipFlow(flow.id);
   }
 
   zipMaster();
+  fs.mkdirSync("out", { recursive: true });
+  fs.writeFileSync(path.join("out", "metrics.json"), JSON.stringify(summary, null, 2), "utf8");
   console.log(`✅ Built ${flows.length} flows → out/flows/*.zip and out/master.zip`);
 }
 

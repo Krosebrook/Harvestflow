@@ -4,6 +4,19 @@ import levenshtein from "fast-levenshtein";
 
 const liveRoot = "agents/outputs";
 const goldenRoot = "snapshots/golden";
+const settingsPath = path.join("drift", "settings.json");
+
+let snapshotEditBudgetPct = 0.03;
+if (fs.existsSync(settingsPath)) {
+  try {
+    const settings = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
+    if (typeof settings.snapshotEditBudgetPct === "number") {
+      snapshotEditBudgetPct = settings.snapshotEditBudgetPct;
+    }
+  } catch (err) {
+    console.warn("⚠️  Unable to read drift/settings.json; falling back to default snapshot budget.");
+  }
+}
 
 function listFiles(dir: string): string[] {
   return fs.readdirSync(dir).flatMap(entry => {
@@ -31,7 +44,7 @@ for (const goldenFile of goldenFiles) {
   const goldenText = fs.readFileSync(goldenFile, "utf8");
   const liveText = fs.readFileSync(liveFile, "utf8");
   const lev = levenshtein.get(goldenText, liveText);
-  const budget = Math.ceil(goldenText.length * 0.03);
+  const budget = Math.ceil(goldenText.length * snapshotEditBudgetPct);
   if (lev > budget) {
     console.error(`❌ Snapshot drift: ${rel} (lev=${lev} > budget=${budget})`);
     failures += 1;

@@ -2,12 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Deliverable",
   "type": "object",
-  "required": ["spec_version", "kind", "title", "body", "claims_check"],
+  "required": ["spec_version", "kind", "title", "claims_check"],
   "properties": {
     "spec_version": { "type": "string", "const": "3.1.0" },
     "kind": {
       "type": "string",
-      "enum": ["context_map", "flow_matrix", "scoped_prompt", "audit_report", "knowledge_pack"]
+      "enum": [
+        "context_map",
+        "flow_matrix",
+        "scoped_prompt",
+        "audit_report",
+        "knowledge_pack",
+        "deliverables_map",
+        "drift_report",
+        "compliance_log",
+        "manifest"
+      ]
     },
     "title": { "type": "string" },
     "body": { "type": "string" },
@@ -15,7 +25,27 @@
       "type": "array",
       "items": { "type": "string" },
       "minItems": 1
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "description"],
+        "properties": {
+          "path": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
     }
   },
+  "anyOf": [
+    { "required": ["body"] },
+    { "required": ["attachments"] }
+  ],
   "additionalProperties": true
 }

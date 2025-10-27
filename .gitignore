@@ -4,5 +4,9 @@
 /out
 /dist
 /agents/outputs
+/agents/all-llm-outputs.zip
 /chat-history/out
 /chat-history/node_modules
+/releases
+/drift/fingerprint.current.json
+/dashboard/dist
