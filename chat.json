@@ -1,0 +1,12 @@
+{
+  "conversation_id": "harvestflow-demo-001",
+  "title": "HarvestFlow Session",
+  "messages": [
+    {"id": "u1", "role": "user", "text": "change dir to a new one called HarvestFlow"},
+    {"id": "a1", "role": "assistant", "text": "Created the HarvestFlow directory."},
+    {"id": "u2", "role": "user", "text": "Provide bootstrap for historical chat deliverables."},
+    {"id": "a2", "role": "assistant", "text": "Generated bootstrap_history.sh and TypeScript generator."},
+    {"id": "u3", "role": "user", "text": "What about drift protection?"},
+    {"id": "a3", "role": "assistant", "text": "Outlined fingerprint, schema, snapshot, semantic guards."}
+  ]
+}

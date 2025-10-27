@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Deliverable",
+  "type": "object",
+  "required": ["spec_version", "kind", "title", "body", "claims_check"],
+  "properties": {
+    "spec_version": { "type": "string", "const": "3.1.0" },
+    "kind": {
+      "type": "string",
+      "enum": ["context_map", "flow_matrix", "scoped_prompt", "audit_report", "knowledge_pack"]
+    },
+    "title": { "type": "string" },
+    "body": { "type": "string" },
+    "claims_check": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": true
+}

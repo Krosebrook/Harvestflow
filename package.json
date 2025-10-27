@@ -1,0 +1,53 @@
+{
+  "name": "harvestflow-pipeline",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "clean": "rimraf dist out",
+    "build": "tsc -p .",
+    "dev": "ts-node src/index.ts",
+    "run": "node dist/index.js",
+    "zip:all": "npm run build && node dist/index.js",
+    "test:smoke": "node dist/utils/smoke.js",
+    "ui": "ts-node src/server.ts",
+    "dev:ui": "tsx src/server.ts",
+    "run:llms": "bash agents/run-all.sh",
+    "bundle:llms": "zip -qr agents/all-llm-outputs.zip agents/outputs",
+    "drift:fingerprint": "ts-node scripts/fingerprint.ts",
+    "drift:save": "npm run drift:fingerprint && cp drift/fingerprint.current.json drift/fingerprint.baseline.json",
+    "drift:check": "node scripts/drift_check.js",
+    "drift:validate": "ts-node scripts/validate_outputs.ts",
+    "drift:snapshot": "ts-node scripts/snapshot_diff.ts",
+    "drift:semantic": "ts-node scripts/semantic_guard.ts",
+    "drift:manifest": "ts-node scripts/manifest.ts"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "chart.js": "^4.5.1",
+    "compromise": "^14.14.4",
+    "compromise-sentences": "^0.3.0",
+    "cosine-similarity": "^1.0.1",
+    "crypto-js": "^4.2.0",
+    "express": "^5.1.0",
+    "fast-levenshtein": "^3.0.0",
+    "glob": "^11.0.3",
+    "js-yaml": "^4.1.0",
+    "jsonschema": "^1.5.0",
+    "marked": "^16.4.1",
+    "nanoid": "^5.1.6",
+    "natural": "^8.1.0",
+    "p-limit": "^7.2.0",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.4",
+    "@types/node": "^24.9.1",
+    "tsx": "^4.20.6",
+    "vite": "^7.1.12"
+  }
+}

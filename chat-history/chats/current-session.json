@@ -1,0 +1,16 @@
+{
+  "conversation_id": "current-session-001",
+  "title": "HarvestFlow Setup Walkthrough",
+  "messages": [
+    {"role": "user", "text": "change dir to a new one called HarvestFlow"},
+    {"role": "assistant", "text": "Created `HarvestFlow` under /home/kyler."},
+    {"role": "user", "text": "Provide bootstrap for historical chat deliverables."},
+    {"role": "assistant", "text": "Generated bootstrap_history.sh with TypeScript pipeline."},
+    {"role": "user", "text": "What about drift protection?"},
+    {"role": "assistant", "text": "Delivered fingerprint, schema, snapshot, semantic guard instructions."},
+    {"role": "user", "text": "Where do I start the chat in the CLI?"},
+    {"role": "assistant", "text": "Explained Claude/Codex/Gemini CLI entry and automation."},
+    {"role": "user", "text": "Generate historical chat deliverables from my first query."},
+    {"role": "assistant", "text": "Produced Markdown bundle with summaries and audits."}
+  ]
+}

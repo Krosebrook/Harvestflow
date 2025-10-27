@@ -1,0 +1,6 @@
+{
+  "spec_version": "3.1.0",
+  "prompt_pack": "2025-10-27",
+  "node": ">=20.0.0",
+  "llm_profiles": ["gpt-4o", "claude-3-5-sonnet", "gemini-1.5-pro"]
+}

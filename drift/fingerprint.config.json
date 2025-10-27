@@ -1,0 +1,15 @@
+{
+  "lock": [
+    "agents/claude.md",
+    "agents/agents.md",
+    "agents/prompts/01-context-engineer.md",
+    "agents/prompts/02-deliverables-map.md",
+    "agents/prompts/03-safety-and-quality.md",
+    "agents/prompts/04-execution.md",
+    "agents/prompts/05-drift-guardian.md",
+    "src/schema/types.ts",
+    "package.json",
+    "package-lock.json"
+  ],
+  "ignorePatterns": ["**/outputs/**", "out/**", "dist/**"]
+}
