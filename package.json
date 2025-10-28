@@ -17,16 +17,19 @@
     "snapshot:save": "tsx scripts/save_snapshots.ts",
     "drift:fingerprint": "tsx scripts/fingerprint.ts",
     "drift:save": "npm run drift:fingerprint && cp drift/fingerprint.current.json drift/fingerprint.baseline.json",
-    "drift:check": "node scripts/drift_check.js",
+    "drift:check": "node scripts/drift_check.cjs",
     "drift:validate": "tsx scripts/validate_outputs.ts",
     "drift:snapshot": "tsx scripts/snapshot_diff.ts",
     "drift:semantic": "tsx scripts/semantic_guard.ts",
     "drift:manifest": "tsx scripts/manifest.ts",
     "release:bundle": "tsx scripts/create_release_bundle.ts",
     "dashboard:dev": "vite --config dashboard/vite.config.ts",
-    "dashboard:build": "vite build --config dashboard/vite.config.ts"
+    "dashboard:build": "vite build --config dashboard/vite.config.ts",
+    "populate:llms": "tsx scripts/populate_llm_outputs.ts",
+    "dropzone:cleanup": "tsx scripts/dropzone_cleanup.ts"
   },
   "dependencies": {
+    "@types/multer": "^2.0.0",
     "adm-zip": "^0.5.16",
     "chart.js": "^4.5.1",
     "compromise": "^14.14.4",
@@ -39,9 +42,12 @@
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.5.0",
     "marked": "^16.4.1",
+    "multer": "^2.0.2",
     "nanoid": "^5.1.6",
     "natural": "^8.1.0",
     "p-limit": "^7.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
@@ -51,6 +57,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.4",
     "@types/node": "^24.9.1",
+    "@vitejs/plugin-react": "^5.1.0",
     "tsx": "^4.20.6",
     "vite": "^7.1.12"
   }

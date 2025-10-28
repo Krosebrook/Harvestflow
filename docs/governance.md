@@ -22,6 +22,10 @@
 - [ ] Manifest generated (`npm run drift:manifest`).
 - [ ] Baselines refreshed (`npm run drift:save`, `npm run snapshot:save`) when intentional changes occur.
 - [ ] Documentation (`README.md`, governance notes) updated post-change.
+- [ ] Dropzone organiser session reviewed (`dropzone/sessions/<id>/report.json`) and archived if sensitive.
+- [ ] Dropzone cleanup executed (`npm run dropzone:cleanup -- --dry-run` before deleting) to enforce retention policy.
 
 ## Change Log
 - _2025-10-27:_ Established baseline lifecycle, snapshot saver, and drift threshold governance.
+- _2025-10-27:_ Added dropzone auto-organiser workflow with persisted reports and structured bundles.
+- _2025-10-27:_ Introduced dropzone cleanup script and optional Basic Auth guard.

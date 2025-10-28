@@ -1,0 +1,20 @@
+services:
+  harvestflow:
+    image: harvestflow/local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+      - DROPZONE_ROOT=/data/dropzone
+      - PORT=5173
+      - BASIC_AUTH_USER=${BASIC_AUTH_USER:-}
+      - BASIC_AUTH_PASS=${BASIC_AUTH_PASS:-}
+    volumes:
+      - ./dropzone-data:/data/dropzone
+      - ./chat-history:/app/chat-history
+      - ./chat.json:/app/chat.json
+    command: ["node", "dist/server.js"]
+    restart: unless-stopped

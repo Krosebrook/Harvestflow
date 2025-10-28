@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+dist
+dashboard/dist
+dropzone
+.git
+.gitignore
+chat-history/chats/*
+out
+logs
+snapshots
+coverage
+tmp
+.DS_Store

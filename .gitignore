@@ -9,4 +9,6 @@
 /chat-history/node_modules
 /releases
 /drift/fingerprint.current.json
+/logs
 /dashboard/dist
+/dropzone-data
