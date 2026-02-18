@@ -1123,7 +1123,12 @@ async function main() {
       inputs.deploymentUrl = args[i + 1];
       i++;
     } else if (args[i] === '--audience' && args[i + 1]) {
-      inputs.intendedAudience = args[i + 1] as any;
+      const audience = args[i + 1];
+      if (audience === 'Employee' || audience === 'Public' || audience === 'Both') {
+        inputs.intendedAudience = audience;
+      } else {
+        console.error(`Invalid audience: ${audience}. Must be Employee, Public, or Both. Defaulting to Both.`);
+      }
       i++;
     } else if (args[i] === '--handles-pii') {
       inputs.handlesPII = true;
