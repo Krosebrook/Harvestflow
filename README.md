@@ -757,11 +757,7 @@ npm run audit:production \
 
 ### Integration with CI/CD
 
-Add to GitHub Actions workflow:
-```yaml
-- name: Production Readiness Audit
-  run: npm run audit:production
-```
+A complete GitHub Actions workflow is provided at `.github/workflows/production-readiness-audit.yml`. See [Production Readiness Audit Documentation](./docs/production-readiness-audit.md) for full integration examples.
 
 The audit exits with code 1 if critical blockers are found, failing the CI pipeline.
 
@@ -773,7 +769,7 @@ The audit exits with code 1 if critical blockers are found, failing the CI pipel
 - **[CLI Audit](./docs/cli-audit.md)**: CLI installation and configuration audit
 - **[Dependency Matrix](./docs/dependency-matrix.md)**: Comprehensive dependency analysis
 - **[Governance](./docs/governance.md)**: Baseline processes and checklist
-- **[Production Readiness Audit](./scripts/production_readiness_audit.ts)**: Source code for audit tool
+- **[Production Readiness Audit](./docs/production-readiness-audit.md)**: Complete guide to production readiness assessment
 - **[API Reference](./docs/api.md)**: *(planned)* API endpoint documentation
 
 ### External References
