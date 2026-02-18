@@ -30,7 +30,8 @@
     "release:bundle": "turbo release:bundle",
     "populate:llms": "turbo populate:llms",
     "dropzone:cleanup": "turbo dropzone:cleanup",
-    "snapshot:save": "turbo snapshot:save"
+    "snapshot:save": "turbo snapshot:save",
+    "audit:production": "tsx scripts/production_readiness_audit.ts"
   },
   "dependencies": {
     "@types/multer": "^2.0.0",

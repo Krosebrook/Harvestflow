@@ -1,0 +1,122 @@
+name: Production Readiness Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Run weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  audit:
+    name: Production Readiness Assessment
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      actions: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git-based checks
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set audience based on branch
+        id: set-audience
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "audience=Public" >> $GITHUB_OUTPUT
+          else
+            echo "audience=Employee" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Production Readiness Audit
+        id: audit
+        run: |
+          npm run audit:production \
+            --audience ${{ steps.set-audience.outputs.audience }} \
+            --handles-secrets
+        continue-on-error: true
+
+      - name: Upload Audit Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-readiness-audit-${{ github.sha }}
+          path: PRODUCTION_READINESS_AUDIT.md
+          retention-days: 90
+
+      - name: Comment PR with Audit Results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('PRODUCTION_READINESS_AUDIT.md', 'utf8');
+            
+            // Extract summary section
+            const summaryMatch = report.match(/SECTION E — EXECUTIVE SUMMARY[\s\S]*?(?=═{79})/);
+            const summary = summaryMatch ? summaryMatch[0] : 'Could not extract summary';
+            
+            const comment = `## 🔍 Production Readiness Audit Results
+            
+            <details>
+            <summary>View Executive Summary</summary>
+            
+            \`\`\`
+            ${summary}
+            \`\`\`
+            
+            </details>
+            
+            📄 Full report available in workflow artifacts.
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Check for Critical Blockers
+        if: always()
+        run: |
+          if grep -q "CRITICAL" PRODUCTION_READINESS_AUDIT.md; then
+            echo "❌ Critical blockers found in audit"
+            grep "CRITICAL" PRODUCTION_READINESS_AUDIT.md || true
+            exit 1
+          fi
+          echo "✅ No critical blockers found"
+
+      - name: Notify on Failure
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Production Readiness Audit Failed',
+              body: `Production readiness audit failed on main branch.
+              
+              Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              
+              Please review the audit report and address critical blockers.`,
+              labels: ['audit', 'production-readiness', 'priority-high']
+            });
