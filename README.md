@@ -162,6 +162,37 @@ npm run drift:semantic     # Semantic similarity check
 npm run drift:manifest     # Manifest validation
 ```
 
+### Production Readiness Audit
+```bash
+npm run audit:production   # Run comprehensive production readiness audit
+
+# With custom options
+npx tsx scripts/production_readiness_audit.ts \
+  --deployment-url https://your-app.com \
+  --audience Public \
+  --handles-pii \
+  --handles-payments
+```
+
+**What it checks:**
+- Identity & Access Control (Authentication, RBAC, least privilege)
+- Secrets & Configuration Hygiene (.env handling, no committed secrets)
+- Data Safety & Privacy (Storage, encryption, backups, retention)
+- Reliability & Error Handling (Timeouts, retries, graceful degradation)
+- Observability & Monitoring (Logging, error tracking, metrics, alerts)
+- CI/CD & Deployment Safety (CI config, tests, linting, rollback)
+- Security Hardening (Input validation, rate limiting, CORS, CSP)
+- Testing Coverage (Unit, integration, E2E, coverage)
+- Performance & Cost Controls (Rate limits, caching, resource limits)
+- Documentation & Operations (README, setup, runbook, incident procedures)
+
+**Readiness Levels:**
+- 0-25: Prototype
+- 26-35: Dev Preview
+- 36-42: Employee Pilot Ready (with conditions)
+- 43-50: Public Beta Ready
+- 51+: Production Ready
+
 ### Deployment
 ```bash
 npm run release:bundle     # Stage versioned release
@@ -543,12 +574,206 @@ GitHub Actions workflow validates drift on every PR (requires workflow scope fix
 
 ---
 
+## Production Readiness Audit
+
+### Overview
+Comprehensive production readiness assessment tool that evaluates software across 10 critical categories (0-5 score each) to determine readiness for:
+- Employee/Internal Use
+- Public Beta
+- Production-Grade Launch
+
+**Design Philosophy:**
+- Evidence-only evaluation (no assumptions)
+- Strict scoring (assumes real users, real data, real risk)
+- Clear actionable blockers and improvements
+- Blunt, honest assessment
+
+### Quick Start
+```bash
+# Run audit on current repository
+npm run audit:production
+
+# Audit with deployment URL and flags
+npx tsx scripts/production_readiness_audit.ts \
+  --deployment-url https://your-app.com \
+  --audience Public \
+  --handles-pii \
+  --handles-payments \
+  --handles-secrets
+```
+
+### Audit Categories (50 points total)
+
+**1. Identity & Access Control (0-5)**
+- Authentication implementation
+- Role-based access control (RBAC)
+- Least privilege principles
+- No hardcoded credentials
+
+**2. Secrets & Configuration Hygiene (0-5)**
+- .env handling and .gitignore
+- No committed secrets
+- Configuration documentation
+- Secret rotation capability
+
+**3. Data Safety & Privacy (0-5)**
+- Data storage location documented
+- Encryption (at-rest and in-transit)
+- Backup strategy
+- Data retention policy
+- PII protection (if applicable)
+
+**4. Reliability & Error Handling (0-5)**
+- Graceful error handling
+- Timeout configuration
+- Retry logic with backoff
+- Fail-safe mechanisms
+- Health check endpoints
+
+**5. Observability & Monitoring (0-5)**
+- Logging implementation
+- Structured logging
+- Error tracking (Sentry, Rollbar, etc.)
+- Metrics collection
+- Alert mechanisms
+
+**6. CI/CD & Deployment Safety (0-5)**
+- CI configuration present
+- Automated tests in CI
+- Linting enforcement
+- Build verification
+- Rollback strategy
+
+**7. Security Hardening (0-5)**
+- Input validation (Zod, etc.)
+- Rate limiting
+- CORS configuration
+- CSP headers
+- Dependency scanning
+
+**8. Testing Coverage (0-5)**
+- Unit tests
+- Integration/E2E tests
+- Test framework configured
+- Code coverage tooling
+- Smoke tests
+
+**9. Performance & Cost Controls (0-5)**
+- API rate limits
+- Resource limits
+- Caching mechanisms
+- Performance budgets
+- Cost control measures
+
+**10. Documentation & Operational Readiness (0-5)**
+- README with accurate setup instructions
+- Operational runbook
+- Incident response procedures
+- API documentation
+
+### Readiness Classification
+
+**Total Score Interpretation:**
+- **0-25** → **Prototype**: Early development, not ready for any users
+- **26-35** → **Dev Preview**: Suitable for internal testing only
+- **36-42** → **Employee Pilot Ready**: Can be used internally with conditions
+- **43-50** → **Public Beta Ready**: Ready for external users with support
+- **51+** → **Production Ready**: Requires perfect score + additional criteria
+
+### Report Output
+
+The audit generates a comprehensive report with:
+
+**Section A — Scorecard Table**
+- Summary of all 10 categories with scores and status
+
+**Section B — Detailed Findings**
+- Per-category findings with evidence
+- Reasoning for each score
+- Specific issues identified
+
+**Section C — Blockers**
+- Critical blockers (must fix before ANY use)
+- Public launch blockers
+- Categorized by severity
+
+**Section D — Readiness Verdict**
+- Total score and readiness level
+- Clear interpretation
+
+**Section E — Executive Summary**
+- Safe for employees? (Yes/No)
+- Safe for customers? (Yes/No)
+- What would break first under real usage?
+- What would scare a security review?
+- Top 5 highest-leverage improvements
+
+### Example Report Location
+```
+PRODUCTION_READINESS_AUDIT.md  # Generated at repository root
+```
+
+### Runtime Checks (Optional)
+
+If `--deployment-url` is provided, the auditor performs runtime checks:
+- HTTP status verification
+- Response time measurement
+- Security header inspection
+- Authentication behavior testing
+- Rate limiting validation
+
+### Command-Line Options
+
+```bash
+--repo-path <path>           # Path to repository (default: current directory)
+--deployment-url <url>       # URL to deployed application (optional)
+--audience <type>            # Employee|Public|Both (default: Both)
+--handles-pii                # Application handles PII data
+--handles-payments           # Application processes payments
+--handles-secrets            # Application stores API keys/secrets
+```
+
+### Use Cases
+
+**Pre-Release Checklist:**
+```bash
+npm run audit:production --handles-pii --audience Public
+```
+
+**Internal Tool Assessment:**
+```bash
+npm run audit:production --audience Employee
+```
+
+**Full Production Audit:**
+```bash
+npm run audit:production \
+  --deployment-url https://prod.example.com \
+  --audience Public \
+  --handles-pii \
+  --handles-payments \
+  --handles-secrets
+```
+
+### Integration with CI/CD
+
+Add to GitHub Actions workflow:
+```yaml
+- name: Production Readiness Audit
+  run: npm run audit:production
+```
+
+The audit exits with code 1 if critical blockers are found, failing the CI pipeline.
+
+---
+
 ## Documentation
 
 ### Available Docs
 - **[CLI Audit](./docs/cli-audit.md)**: CLI installation and configuration audit
 - **[Dependency Matrix](./docs/dependency-matrix.md)**: Comprehensive dependency analysis
 - **[Governance](./docs/governance.md)**: Baseline processes and checklist
+- **[Production Readiness Audit](./scripts/production_readiness_audit.ts)**: Source code for audit tool
 - **[API Reference](./docs/api.md)**: *(planned)* API endpoint documentation
 
 ### External References
