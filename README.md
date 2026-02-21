@@ -310,6 +310,142 @@ Edit `docker-compose.yml` to adjust:
 
 ---
 
+## Vercel Deployment (Full Stack)
+
+Vercel runs the Express API as a serverless Node.js function and serves the
+dashboard through it.
+
+> **⚠️ Limitation**: Dropzone session storage uses the filesystem. On Vercel
+> the filesystem is ephemeral — sessions survive only for the lifetime of a
+> single function invocation. Set `DROPZONE_ROOT=/tmp/dropzone` in Vercel
+> environment variables, or migrate to an external store for persistence.
+
+### Deployment Checklist
+
+| Setting | Value |
+|---|---|
+| Framework Preset | **Other** (do not select Next.js) |
+| Install Command | `npm ci` |
+| Build Command | `npm run build && npm run build:server` |
+| Output Directory | *(leave blank — handled by serverless function)* |
+| Node.js Version | **22.x** |
+
+### Environment Variables (Vercel Dashboard → Settings → Environment Variables)
+
+| Variable | Required | Notes |
+|---|---|---|
+| `NODE_ENV` | Yes | `production` |
+| `DROPZONE_ROOT` | Yes | `/tmp/dropzone` (ephemeral) |
+| `BASIC_AUTH_USER` | No | Protect dashboard |
+| `BASIC_AUTH_PASS` | No | Protect dashboard |
+| `ANTHROPIC_API_KEY` | No | LLM features |
+| `OPENAI_API_KEY` | No | LLM features |
+| `GOOGLE_API_KEY` | No | LLM features |
+
+### CLI Deploy
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# First deploy
+vercel --prod
+
+# Subsequent deploys
+vercel --prod
+```
+
+### Local Verification (Vercel)
+```bash
+# Build everything
+npm run build && npm run build:server
+
+# Start server locally
+node dist/server.js &
+
+# Smoke-test the health endpoint
+curl http://localhost:5173/health
+# Expected: {"status":"ok","ts":"..."}
+
+# Stop server
+kill %1
+```
+
+---
+
+## Cloudflare Pages Deployment (Dashboard SPA)
+
+Cloudflare Pages hosts the pre-built Vite SPA (`apps/dashboard/dist`).
+
+> **⚠️ Limitation**: The Express API uses `fs`, `multer`, and disk-based
+> session storage — none of which are available in Cloudflare Workers.
+> Deploy the API separately (Docker / Vercel / Fly.io) and configure
+> `VITE_API_BASE_URL` at build time to point the dashboard at the API.
+
+### Deployment Checklist
+
+| Setting | Value |
+|---|---|
+| Framework Preset | **Vite** |
+| Install Command | `npm ci` |
+| Build Command | `npm run build` |
+| Build Output Directory | `apps/dashboard/dist` |
+| Root Directory | *(leave blank — repo root)* |
+| Node.js Version | **22** |
+
+### Environment Variables (Cloudflare Pages → Settings → Environment Variables)
+
+| Variable | Required | Notes |
+|---|---|---|
+| `VITE_API_BASE_URL` | Yes | URL of separately hosted Express API |
+
+### CLI Deploy
+```bash
+# Install Wrangler
+npm i -g wrangler
+
+# Build dashboard
+npm run build
+
+# Deploy to Cloudflare Pages
+npx wrangler pages deploy apps/dashboard/dist \
+  --project-name harvestflow-dashboard
+```
+
+### Local Verification (Cloudflare)
+```bash
+# Build dashboard
+npm run build
+
+# Serve locally with wrangler
+npx wrangler pages dev apps/dashboard/dist --port 8788
+
+# Dashboard available at http://localhost:8788
+```
+
+### Smoke Check (Both Platforms)
+```bash
+# Full local smoke check — builds everything and hits the health endpoint
+npm run build:all
+
+# Start server in background
+PORT=5173 node dist/server.js &
+SERVER_PID=$!
+
+# Wait for startup
+sleep 2
+
+# Health check
+curl -sf http://localhost:5173/health && echo "✅ /health OK"
+
+# Dashboard reachability
+curl -sf http://localhost:5173/ -o /dev/null && echo "✅ / OK"
+
+# Clean up
+kill $SERVER_PID
+```
+
+---
+
 ## Historical Chat Pipeline
 
 ### Setup

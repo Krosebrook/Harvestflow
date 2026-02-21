@@ -1,5 +1,8 @@
 /node_modules
+**/node_modules
 /.env
+.env.local
+.env.*.local
 .DS_Store
 /out
 /dist
@@ -11,5 +14,16 @@
 /drift/fingerprint.current.json
 /logs
 /dashboard/dist
+apps/dashboard/dist
 /dropzone-data
 PRODUCTION_READINESS_AUDIT.md
+
+# Turbo
+.turbo/
+
+# Vercel
+.vercel/
+
+# Cloudflare
+.wrangler/
+.dev.vars
