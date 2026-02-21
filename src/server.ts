@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import { promises as fsp } from "fs";
@@ -17,10 +18,24 @@ const HAS_DASHBOARD_ASSETS = fs.existsSync(path.join(DASHBOARD_DIST, "index.html
 const BASIC_AUTH_USER = process.env.BASIC_AUTH_USER;
 const BASIC_AUTH_PASS = process.env.BASIC_AUTH_PASS;
 
+// ── Security headers ──────────────────────────────────────────────────────────
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("X-XSS-Protection", "0");
+  next();
+});
+
 fs.mkdirSync(INCOMING_DIR, { recursive: true });
 fs.mkdirSync(SESSIONS_DIR, { recursive: true });
 
 const upload = multer({ dest: INCOMING_DIR });
+
+// ── Health check (unauthenticated) ───────────────────────────────────────────
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", ts: new Date().toISOString() });
+});
 
 if (BASIC_AUTH_USER && BASIC_AUTH_PASS) {
   app.use((req, res, next) => {
@@ -142,6 +157,16 @@ if (HAS_DASHBOARD_ASSETS) {
 }
 
 const port = process.env.PORT || 5173;
-app.listen(port, () => {
-  console.log(`Metrics UI → http://localhost:${port}`);
-});
+
+// Start the HTTP server only when executed directly (not imported by Vercel/tests).
+const isMain =
+  Boolean(process.argv[1]) &&
+  fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+
+if (isMain || !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Metrics UI → http://localhost:${port}`);
+  });
+}
+
+export default app;
