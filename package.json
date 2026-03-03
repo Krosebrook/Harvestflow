@@ -4,17 +4,25 @@
   "type": "module",
   "version": "1.0.0",
   "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
     "build": "turbo build",
+    "build:server": "tsc -p tsconfig.json",
+    "build:all": "npm run build && npm run build:server",
     "dev": "turbo dev",
+    "preview": "npm run build:all && node dist/server.js",
+    "smoke": "npm run build:all && node dist/server.js & sleep 3 && curl -sf http://localhost:5173/health && kill %2",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "clean": "turbo clean && rimraf node_modules/.cache",
+    "clean": "turbo clean && rimraf node_modules/.cache dist",
     "dashboard:dev": "turbo dashboard:dev",
     "dashboard:build": "turbo dashboard:build",
     "drift:check": "turbo drift:check",

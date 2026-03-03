@@ -1,14 +1,16 @@
-FROM node:20 AS builder
+FROM node:22 AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build && npm run dashboard:build
+# 'npm run build' (turbo) builds the dashboard SPA + shared packages.
+# 'npm run build:server' compiles src/server.ts → dist/server.js via tsc.
+RUN npm run build && npm run build:server
 RUN npm prune --omit=dev
 
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
